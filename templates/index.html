@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Roobrt AI — مساعدك الذكي</title>
+<meta name="description" content="Roobrt AI — مساعدك الذكي. محادثات فورية، إجابات دقيقة، بالعربية والدارجة.">
+<meta name="theme-color" content="#0a84ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roobrt AI">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+<link rel="apple-touch-icon" href="/static/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b0f;
+  --card:#16161c;
+  --border:rgba(255,255,255,0.08);
+  --text:#fff;
+  --subtext:#8e8e93;
+  --input:#0b0b0f;
+  --accent:#0a84ff;
+  --accent2:#0062d2;
+  --sidebar:#12121a;
+  --user-bubble:linear-gradient(135deg,#0a84ff,#0062d2);
+}
+/* Themes */
+[data-theme="gold"]{ --accent:#d4a017; --accent2:#b8860b; --user-bubble:linear-gradient(135deg,#d4a017,#b8860b);}
+[data-theme="purple"]{ --accent:#af52de; --accent2:#7a3fb8; --user-bubble:linear-gradient(135deg,#af52de,#7a3fb8);}
+[data-theme="green"]{ --accent:#32d74b; --accent2:#1a8f2f; --user-bubble:linear-gradient(135deg,#32d74b,#1a8f2f);}
+[data-theme="red"]{ --accent:#ff453a; --accent2:#c41e00; --user-bubble:linear-gradient(135deg,#ff453a,#c41e00);}
+[data-theme="light"]{ --bg:#f2f2f7; --card:#fff; --border:rgba(0,0,0,0.08); --text:#000; --subtext:#636366; --input:#f2f2f7; --sidebar:#fff;}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{
+  margin:0;padding:0;
+  background:var(--bg);color:var(--text);
+  font-family:'IBM Plex Sans Arabic',-apple-system,sans-serif;
+  overflow:hidden;height:100vh;
+  transition:background .3s,color .3s;
+}
+
+/* Layout */
+.app{display:flex;flex-direction:column;height:100vh;}
+.topbar{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;
+  padding-top:calc(14px + env(safe-area-inset-top,0px));
+  background:rgba(11,11,15,0.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+}
+[data-theme="light"] .topbar{background:rgba(255,255,255,0.85);}
+.icon-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:transparent;border:1px solid var(--border);
+  color:var(--text);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.icon-btn:active{transform:scale(.9);background:rgba(255,255,255,0.05);}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-weight:700;font-size:17px;letter-spacing:-.3px;
+}
+.logo .dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 12px var(--accent);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.spacer{flex:1;}
+
+/* Chat */
+.chat-wrap{
+  flex:1;overflow-y:auto;
+  padding:20px 16px 130px 16px;
+  scroll-behavior:smooth;
+}
+.chat-wrap::-webkit-scrollbar{width:4px;}
+.chat-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.msg{
+  max-width:82%;padding:12px 16px;border-radius:20px;
+  font-size:15px;line-height:1.7;word-wrap:break-word;
+  margin-bottom:10px;white-space:pre-wrap;
+  animation:msgIn .35s cubic-bezier(.16,1,.3,1);
+}
+@keyframes msgIn{from{opacity:0;transform:translateY(15px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+.msg.user{
+  background:var(--user-bubble);color:#fff;
+  align-self:flex-end;margin-inline-start:auto;
+  border-bottom-left-radius:6px;
+  box-shadow:0 4px 14px rgba(10,132,255,.25);
+}
+.msg.bot{
+  background:var(--card);color:var(--text);
+  border:1px solid var(--border);
+  border-bottom-right-radius:6px;
+}
+.msg.typing{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);
+  width:fit-content;
+}
+.dots{display:flex;gap:4px;}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:bounce 1.4s infinite;}
+.dots span:nth-child(2){animation-delay:.15s;opacity:.7;}
+.dots span:nth-child(3){animation-delay:.3s;opacity:.4;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* Welcome */
+.welcome{
+  text-align:center;padding:30px 20px;
+}
+.welcome-logo{
+  width:100px;height:100px;margin:0 auto 20px;
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.welcome h1{font-size:24px;font-weight:700;margin:0 0 8px;}
+.welcome p{color:var(--subtext);font-size:14px;margin:0 0 24px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:480px;margin:0 auto;}
+.chip{
+  padding:10px 16px;border-radius:14px;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text);font-size:13px;cursor:pointer;
+  font-family:inherit;transition:all .2s;
+}
+.chip:active{transform:scale(.95);border-color:var(--accent);}
+
+/* Input */
+.input-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:12px 16px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,var(--bg) 70%,transparent);
+  display:flex;gap:10px;align-items:flex-end;
+}
+.input-wrap{
+  flex:1;display:flex;align-items:center;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:26px;padding:6px 16px;
+  transition:border-color .2s;
+}
+.input-wrap:focus-within{border-color:var(--accent);}
+textarea{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:inherit;font-size:15px;
+  resize:none;max-height:120px;line-height:1.5;
+  padding:8px 0;
+}
+.send-btn{
+  width:46px;height:46px;border-radius:50%;
+  background:var(--user-bubble);border:none;
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(10,132,255,.35);
+  transition:transform .2s;
+}
+.send-btn:active{transform:scale(.9);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Sidebar */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(4px);z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.open{opacity:1;pointer-events:auto;}
+.sidebar{
+  position:fixed;top:0;right:0;bottom:0;width:78%;max-width:320px;
+  background:var(--sidebar);border-left:1px solid var(--border);
+  z-index:300;transform:translateX(100%);
+  transition:transform .35s cubic-bezier(.16,1,.3,1);
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);
+}
+.sidebar.open{transform:translateX(0);}
+.sidebar-head{
+  padding:22px 20px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.sidebar-head img{width:44px;height:44px;border-radius:14px;background:var(--card);}
+.sidebar-head h3{margin:0;font-size:16px;font-weight:700;}
+.sidebar-head p{margin:2px 0 0;font-size:11px;color:var(--subtext);}
+.menu{padding:12px 10px;flex:1;overflow-y:auto;}
+.menu-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;border-radius:12px;
+  color:var(--text);font-size:14px;cursor:pointer;
+  font-family:inherit;background:none;border:none;width:100%;
+  text-align:right;transition:background .2s;
+}
+.menu-item:active{background:rgba(255,255,255,.05);}
+.menu-item svg{flex-shrink:0;opacity:.8;}
+.menu-sep{height:1px;background:var(--border);margin:10px 16px;}
+.menu-label{
+  font-size:11px;color:var(--subtext);font-weight:700;
+  padding:14px 16px 8px;letter-spacing:.5px;text-transform:uppercase;
+}
+
+/* Theme Grid */
+.theme-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:10px;padding:8px 16px 16px;
+}
+.theme-dot{
+  aspect-ratio:1;border-radius:50%;
+  border:2.5px solid transparent;cursor:pointer;
+  transition:transform .2s;position:relative;
+}
+.theme-dot:active{transform:scale(.9);}
+.theme-dot.active{border-color:#fff;box-shadow:0 0 12px currentColor;}
+.theme-dot[data-t="blue"]{background:linear-gradient(135deg,#0a84ff,#0062d2);color:#0a84ff;}
+.theme-dot[data-t="gold"]{background:linear-gradient(135deg,#d4a017,#b8860b);color:#d4a017;}
+.theme-dot[data-t="purple"]{background:linear-gradient(135deg,#af52de,#7a3fb8);color:#af52de;}
+.theme-dot[data-t="green"]{background:linear-gradient(135deg,#32d74b,#1a8f2f);color:#32d74b;}
+.theme-dot[data-t="red"]{background:linear-gradient(135deg,#ff453a,#c41e00);color:#ff453a;}
+
+/* Light mode */
+[data-theme="light"] .msg.bot{background:#fff;}
+[data-theme="light"] textarea{color:#000;}
+
+/* Markdown */
+.msg code{
+  background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;
+  font-family:'Courier New',monospace;font-size:13px;
+}
+[data-theme="light"] .msg code{background:rgba(0,0,0,.06);}
+.msg pre{
+  background:rgba(0,0,0,.3);padding:12px;border-radius:10px;
+  overflow-x:auto;margin:8px 0;font-size:13px;
+}
+[data-theme="light"] .msg pre{background:rgba(0,0,0,.06);}
+</style>
+</head>
+<body data-theme="blue">
+
+<div class="app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="icon-btn" onclick="toggleSidebar()" aria-label="القائمة">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="logo">
+      <div class="dot"></div>
+      <span>Roobrt AI</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="icon-btn" onclick="newChat()" aria-label="محادثة جديدة">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-wrap" id="chatWrap">
+    <div class="welcome" id="welcome">
+      <svg class="welcome-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4aa8ff"/>
+            <stop offset="1" stop-color="#0062d2"/>
+          </linearGradient>
+        </defs>
+        <rect x="160" y="120" width="8" height="40" rx="4" fill="#0a84ff"/>
+        <circle cx="164" cy="112" r="14" fill="#ff453a"/>
+        <rect x="140" y="170" width="232" height="200" rx="50" fill="url(#g1)"/>
+        <circle cx="200" cy="260" r="28" fill="#fff"/>
+        <circle cx="312" cy="260" r="28" fill="#fff"/>
+        <circle cx="200" cy="260" r="14" fill="#0b0b1f"/>
+        <circle cx="312" cy="260" r="14" fill="#0b0b1f"/>
+        <rect x="210" y="320" width="92" height="12" rx="6" fill="#fff" opacity=".9"/>
+      </svg>
+      <h1>مرحبا! أنا Roobrt</h1>
+      <p>مساعدك الذكي. كيفاش نقدر نعاونك اليوم؟</p>
+      <div class="chips">
+        <button class="chip" onclick="sendChip('واش راك تقدر تدير؟')">واش راك تقدر تدير؟</button>
+        <button class="chip" onclick="sendChip('أعطيني نصيحة تقنية')">نصيحة تقنية</button>
+        <button class="chip" onclick="sendChip('عاوني في حل مشكلة')">حل مشكلة</button>
+        <button class="chip" onclick="sendChip('فكرة مشروع جديدة')">فكرة مشروع</button>
+      </div>
+    </div>
+    <div id="messages"></div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <textarea id="input" rows="1" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="send()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <img src="/static/icon.svg" alt="Roobrt">
+    <div>
+      <h3>Roobrt AI</h3>
+      <p>الإصدار 1.0</p>
+    </div>
+  </div>
+  <div class="menu">
+    <button class="menu-item" onclick="newChat()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 2v20M2 12h20"/>
+      </svg>
+      محادثة جديدة
+    </button>
+    <button class="menu-item" onclick="clearHistory()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      </svg>
+      حذف السجل
+    </button>
+
+    <div class="menu-sep"></div>
+    <div class="menu-label">الثيمات</div>
+    <div class="theme-grid">
+      <div class="theme-dot active" data-t="blue" onclick="setTheme('blue')"></div>
+      <div class="theme-dot" data-t="gold" onclick="setTheme('gold')"></div>
+      <div class="theme-dot" data-t="purple" onclick="setTheme('purple')"></div>
+      <div class="theme-dot" data-t="green" onclick="setTheme('green')"></div>
+      <div class="theme-dot" data-t="red" onclick="setTheme('red')"></div>
+    </div>
+
+    <div class="menu-sep"></div>
+    <button class="menu-item" onclick="toggleLight()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <span id="lightLabel">الوضع النهاري</span>
+    </button>
+    <button class="menu-item" onclick="alert('Roobrt AI v1.0\nمساعدك الذكي\n© 2026')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      عن التطبيق
+    </button>
+  </div>
+</div>
+
+<script>
+// ============ State ============
+const SYSTEM_PROMPT = `أنت "Roobrt"، مساعد ذكي ودود بالعربية والدارجة الجزائرية.
+
+🎯 شخصيتك:
+- ودود، محترم، مختصر.
+- تهدر بنفس لغة المستخدم (عربية، دارجة، إنجليزية).
+- متخصص في: التقنية، التطبيقات، الأنمي، الأفلام، الأعمال، النصائح.
+
+✅ قواعد:
+- رد بشكل مختصر وواضح.
+- إذا السؤال غامض، اطلب توضيح.
+- إذا ما عرفتش، قل بصراحة "ما نعرفش" + اقتراح.
+- استعمل emojis باعتدال.
+- لا تخترع معلومات.
+
+📌 معلومات:
+- اسمك: Roobrt
+- المطور: فريق QUIC
+- الإصدار: 1.0`;
+
+let history = [];
+let isGenerating = false;
+
+// ============ Theme ============
+function setTheme(t){
+  document.body.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+  document.querySelector(`.theme-dot[data-t="${t}"]`)?.classList.add('active');
+  localStorage.setItem('roobrt_theme', t);
+}
+
+function toggleLight(){
+  const current = document.body.getAttribute('data-theme');
+  if (current === 'light'){
+    setTheme(localStorage.getItem('roobrt_prev_theme') || 'blue');
+    document.getElementById('lightLabel').textContent = 'الوضع النهاري';
+  } else {
+    localStorage.setItem('roobrt_prev_theme', current);
+    document.body.setAttribute('data-theme', 'light');
+    document.getElementById('lightLabel').textContent = 'الوضع الليلي';
+  }
+}
+
+// ============ Sidebar ============
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+// ============ Chat ============
+const chatWrap = document.getElementById('chatWrap');
+const messages = document.getElementById('messages');
+const welcome = document.getElementById('welcome');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+});
+
+function appendMsg(text, role){
+  if (welcome.style.display !== 'none') welcome.style.display = 'none';
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  if (role === 'bot') {
+    div.innerHTML = formatText(text);
+  } else {
+    div.textContent = text;
+  }
+  messages.appendChild(div);
+  chatWrap.scrollTop = chatWrap.scrollHeight;
+  return div;
+}
+
+function formatText(t){
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function appendTyping(){
+  if (welcome.style.display !== 'none') welcome.style.display = 'none';
+  const div = document.createElement('div');
+  div.className = 'msg bot typing';
+  div.id = 'typing';
+  div.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+  messages.appendChild(div);
+  chatWrap.scrollTop = chatWrap.scrollHeight;
+}
+
+function removeTyping(){
+  document.getElementById('typing')?.remove();
+}
+
+function sendChip(text){
+  input.value = text;
+  send();
+}
+
+async function send(){
+  const text = input.value.trim();
+  if (!text || isGenerating) return;
+
+  isGenerating = true;
+  sendBtn.disabled = true;
+
+  appendMsg(text, 'user');
+  history.push({role:'user', content:text});
+  input.value = '';
+  input.style.height = 'auto';
+  appendTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[
+          {role:'system', content:SYSTEM_PROMPT},
+          ...history.slice(-10)
+        ],
+        temperature:0.7,
+        max_tokens:1024
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (!res.ok) throw new Error(data.error?.message || 'HTTP ' + res.status);
+
+    const reply = data?.choices?.[0]?.message?.content || 'ما قدرتش نجاوب. عاود جرب.';
+    history.push({role:'assistant', content:reply});
+    appendMsg(reply, 'bot');
+
+  } catch(err){
+    removeTyping();
+    appendMsg('خطأ: ' + (err.message || 'مشكل تقني'), 'bot');
+  } finally {
+    isGenerating = false;
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+
+// ============ Actions ============
+function newChat(){
+  messages.innerHTML = '';
+  history = [];
+  welcome.style.display = 'block';
+  toggleSidebar();
+  input.focus();
+}
+
+function clearHistory(){
+  if (!confirm('تحب تحذف السجل كامل؟')) return;
+  newChat();
+}
+
+// ============ Init ============
+(function init(){
+  const saved = localStorage.getItem('roobrt_theme');
+  if (saved) setTheme(saved);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/static/service-worker.js').catch(() => {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
