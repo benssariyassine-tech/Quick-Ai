@@ -86,6 +86,16 @@ body::before{
 .topbar-side.left{justify-content:flex-start;}
 .topbar-side.right{justify-content:flex-end;}
 
+/* اسم التطبيق في الوسط */
+.topbar-title{
+  font-size:17px;font-weight:700;
+  letter-spacing:-0.3px;
+  background:linear-gradient(135deg,var(--text) 30%,var(--accent) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
 .icon-btn{
   width:40px;height:40px;border-radius:50%;
   background:var(--glass);
@@ -99,57 +109,24 @@ body::before{
 }
 .icon-btn:active{transform:scale(.9);background:rgba(255,255,255,0.1);}
 
-.topbar-logo{
-  position:relative;
-  width:52px;height:52px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-}
-.topbar-logo::before{
-  content:'';
-  position:absolute;inset:-8px;
-  border-radius:50%;
-  background:radial-gradient(circle, var(--glow) 0%, transparent 70%);
-  opacity:0.6;
-  animation:glowPulse 3s ease-in-out infinite;
-  pointer-events:none;
-}
-.topbar-logo::after{
-  content:'';
-  position:absolute;inset:0;
-  border-radius:50%;
-  background:var(--glass);
-  backdrop-filter:blur(15px);
-  -webkit-backdrop-filter:blur(15px);
-  border:1.5px solid var(--glass-border);
-  box-shadow:
-    0 0 20px var(--glow),
-    inset 0 1px 0 rgba(255,255,255,0.2);
-}
-.topbar-logo svg{
-  position:relative;z-index:2;
-  width:34px;height:34px;
-  filter:drop-shadow(0 2px 8px var(--glow));
-}
-@keyframes glowPulse{
-  0%,100%{opacity:0.4;transform:scale(1);}
-  50%{opacity:0.8;transform:scale(1.15);}
-}
-
 /* ============ CHAT ============ */
 .chat-wrap{
   flex:1;overflow-y:auto;
   padding:24px 16px 140px 16px;
   scroll-behavior:smooth;
+  display:flex;flex-direction:column;align-items:stretch;
 }
 .chat-wrap::-webkit-scrollbar{width:4px;}
 .chat-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 
+/* ✅ البطاقة كتأخذ حجم النص فقط */
 .msg{
+  width:fit-content;
   max-width:85%;
   padding:12px 18px;
   border-radius:22px;
-  font-size:15px;line-height:1.7;
+  font-size:15px;
+  line-height:1.7;
   word-wrap:break-word;
   margin-bottom:12px;
   white-space:pre-wrap;
@@ -160,6 +137,7 @@ body::before{
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   color:#fff;
   margin-inline-start:auto;
+  margin-inline-end:0;
   border-bottom-left-radius:6px;
   box-shadow:0 6px 20px var(--glow);
 }
@@ -169,13 +147,14 @@ body::before{
   -webkit-backdrop-filter:blur(15px);
   border:1px solid var(--glass-border);
   color:var(--text);
+  margin-inline-start:0;
+  margin-inline-end:auto;
   border-bottom-right-radius:6px;
 }
 .msg.typing{
   display:flex;align-items:center;gap:10px;
   background:var(--glass);
   border:1px solid var(--glass-border);
-  width:fit-content;
   padding:14px 20px;
 }
 .dots{display:flex;gap:5px;}
@@ -328,11 +307,11 @@ textarea::placeholder{color:var(--subtext);}
   width:52px;height:52px;
   border-radius:16px;
   background:var(--glass);
-  border:1px solid var(--glass-border);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px var(--glow);
+  border:1glasspx solid var(--glass-border);
+  display:flex;-borderalign-items:);center;justify-content:center;
+  boxmargin-shadow:0 0 :20px var(--glow);
 }
-.sidebar-head .logo-mini svg{width:32px;height:32px;}
+.s12idebar-head .logo-mini svg{width:32px;height:32px;}
 .sidebar-head h3{margin:0;font-size:17px;font-weight:700;}
 .sidebar-head p{margin:2px 0 0;font-size:11.5px;color:var(--subtext);font-weight:500;}
 
@@ -352,7 +331,7 @@ textarea::placeholder{color:var(--subtext);}
 .menu-item:hover{background:rgba(255,255,255,.05);}
 .menu-item:active{background:rgba(255,255,255,.08);transform:scale(.98);}
 .menu-item svg{flex-shrink:0;opacity:.85;}
-.menu-sep{height:1px;background:var(--glass-border);margin:12px 16px;}
+.menu-sep{height:1px;background:var(--px 16px;}
 .menu-label{
   font-size:11px;color:var(--subtext);
   font-weight:700;padding:16px 16px 10px;
@@ -408,6 +387,7 @@ textarea::placeholder{color:var(--subtext);}
 <body data-theme="blue">
 
 <div class="app">
+  <!-- ============ TOPBAR ============ -->
   <div class="topbar">
     <div class="topbar-side left">
       <button class="icon-btn" onclick="newChat()" aria-label="محادثة جديدة">
@@ -418,24 +398,8 @@ textarea::placeholder{color:var(--subtext);}
       </button>
     </div>
 
-    <div class="topbar-logo" onclick="toggleSidebar()" title="القائمة">
-      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="gHead" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#4aa8ff"/>
-            <stop offset="1" stop-color="#0062d2"/>
-          </linearGradient>
-        </defs>
-        <rect x="244" y="40" width="24" height="60" rx="12" fill="#0a84ff"/>
-        <circle cx="256" cy="30" r="30" fill="#ff453a"/>
-        <rect x="90" y="130" width="332" height="290" rx="75" fill="url(#gHead)"/>
-        <circle cx="180" cy="260" r="45" fill="#fff"/>
-        <circle cx="332" cy="260" r="45" fill="#fff"/>
-        <circle cx="180" cy="260" r="22" fill="#0b0b1f"/>
-        <circle cx="332" cy="260" r="22" fill="#0b0b1f"/>
-        <rect x="195" y="345" width="122" height="16" rx="8" fill="#fff" opacity="0.9"/>
-      </svg>
-    </div>
+    <!-- اسم التطبيق في الوسط -->
+    <div class="topbar-title">Roobrt AI</div>
 
     <div class="topbar-side right">
       <button class="icon-btn" onclick="toggleSidebar()" aria-label="القائمة">
@@ -448,6 +412,7 @@ textarea::placeholder{color:var(--subtext);}
     </div>
   </div>
 
+  <!-- ============ CHAT ============ -->
   <div class="chat-wrap" id="chatWrap">
     <div class="welcome" id="welcome">
       <svg class="welcome-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -466,8 +431,8 @@ textarea::placeholder{color:var(--subtext);}
         <circle cx="332" cy="260" r="22" fill="#0b0b1f"/>
         <rect x="195" y="345" width="122" height="16" rx="8" fill="#fff" opacity="0.9"/>
       </svg>
-      <h1 class="welcome-title">مرحبا، أنا <strong>Roobrt</strong></h1>
-      <p class="welcome-sub">مساعدك الذكي. كيفاش نقدر نعاونك اليوم؟</p>
+      <h1 class="welcome-title" id="welcomeTitle">مرحبا، أنا <strong>Roobrt</strong></h1>
+      <p class="welcome-sub" id="welcomeSub">مساعدك الذكي. كيفاش نقدر نعاونك اليوم؟</p>
       <div class="chips">
         <button class="chip" onclick="sendChip('واش راك تقدر تدير؟')">✨ واش راك تقدر تدير؟</button>
         <button class="chip" onclick="sendChip('أعطيني نصيحة تقنية')">💡 نصيحة تقنية</button>
@@ -478,6 +443,7 @@ textarea::placeholder{color:var(--subtext);}
     <div id="messages"></div>
   </div>
 
+  <!-- ============ INPUT ============ -->
   <div class="input-bar">
     <div class="input-wrap">
       <textarea id="input" rows="1" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
@@ -491,6 +457,7 @@ textarea::placeholder{color:var(--subtext);}
   </div>
 </div>
 
+<!-- ============ SIDEBAR ============ -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
   <div class="sidebar-head">
@@ -559,58 +526,33 @@ textarea::placeholder{color:var(--subtext);}
 </div>
 
 <script>
-const SYSTEM_PROMPT = `أنت "Roobrt"، الروبوت الرسمي لمشروع Quick AI، والمساعد الذكي الرسمي لموقع iStore.
+// ============ SYSTEM PROMPT (قصير) ============
+const SYSTEM_PROMPT = `أنت "Roobrt"، مساعد ذكي ودود بالعربية والدارجة.
 
 🎯 هويتك:
-- اسمك: Roobrt (روبرت)
-- أنت نفس الروبوت الأزرق اللي كاين في موقع iStore.
-- مشروعك: Quick AI + iStore
-- المطور: فريق iStore (نفس الفريق)
-
-🏢 معلومات عن iStore (الأب):
-- iStore = متجر تطبيقات iOS (IPA) وأندرويد (APK)
-- الرابط الرسمي: https://ipa-store.onrender.com
-- كيوفر: تطبيقات IPA معدلة، ألعاب، أدوات iOS
-- المستخدمين: جزائريين وعرب
-- التحميل: مجاني بالكامل
-- الميزات: شات AI، إعجابات، تعليقات، تقييمات
-- أنا (Roobrt) هو الروبوت اللي كاين في iStore.
-- Quick AI = نسخة مستقلة من الروبوت مع تطبيق PWA خاص.
-
-📌 إذا سقساك أحد عن iStore:
-- قول بلي هو مشروعنا الأصلي.
-- قول بلي كيوفر تطبيقات IPA/APK.
-- قول بلي كاين رابط رسمي: https://ipa-store.onrender.com
-- قول بلي أنا (Roobrt) نفس الروبوت الموجود في iStore.
-
-✅ ما تقدر تدير:
-- الإجابة عن أي سؤال (عربي، دارجة، إنجليزي).
-- نصائح تقنية، أفلام، أنمي، أعمال، حل مشاكل.
-- ترفيه ونكت خفيفة.
-- شرح مواضيع تقنية.
-
-❌ ما تديرش:
-- لا تخترع معلومات.
-- لا تحكي على سياسة، رياضة، دين (خليها محايدة).
-- لا تذكر GPT ولا Claude ولا أي AI آخر. أنت "Roobrt" فقط.
-
-🎨 شخصيتك:
-- ودود، محترم، مختصر.
-- تهدر بنفس لغة المستخدم.
-- تستعمل emojis باعتدال.
-- إذا السؤال غامض، طلب توضيح.
-
-📌 معلومات ثابتة:
 - اسمك: Roobrt
-- المطور: فريق iStore
-- النسخة: Quick AI v1.0
-- البريد الرسمي: support.istoreipa@gmail.com
-- موقعك: https://quick-ai-99ax.onrender.com
-- الموقع الأصلي: https://ipa-store.onrender.com`;
+- من فريق iStore (متجر تطبيقات IPA/APK)
+- الرابط: https://ipa-store.onrender.com
+
+✅ تخصصاتك:
+- تقنية، تطبيقات، ألعاب، أفلام، أنمي، أعمال
+- نصائح وحلول مشاكل
+- ترفيه خفيف
+
+❌ ممنوع:
+- لا تخترع معلومات
+- لا تذكر AI آخر (GPT/Claude)
+- سياسة/دين (خليها محايدة)
+
+🎨 أسلوبك:
+- مختصر وواضح
+- بنفس لغة المستخدم
+- emojis باعتدال`;
 
 let history = [];
 let isGenerating = false;
 
+// ============ Theme ============
 function setTheme(t){
   document.body.setAttribute('data-theme', t);
   document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
@@ -631,11 +573,13 @@ function toggleLight(){
   }
 }
 
+// ============ Sidebar ============
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('overlay').classList.toggle('open');
 }
 
+// ============ Chat ============
 const chatWrap = document.getElementById('chatWrap');
 const messages = document.getElementById('messages');
 const welcome = document.getElementById('welcome');
@@ -711,10 +655,10 @@ async function send(){
         model:'openai/gpt-oss-120b',
         messages:[
           {role:'system', content:SYSTEM_PROMPT},
-          ...history.slice(-10)
+          ...history.slice(-4)
         ],
         temperature:0.7,
-        max_tokens:1024
+        max_tokens:500
       })
     });
 
@@ -737,6 +681,7 @@ async function send(){
   }
 }
 
+// ============ Actions ============
 function newChat(){
   messages.innerHTML = '';
   history = [];
@@ -750,10 +695,56 @@ function clearHistory(){
   newChat();
 }
 
-(function init(){
-  const saved = localStorage.getItem('roobrt_theme');
-  if (saved) setTheme(saved);
+// ============ Dynamic Greeting ============
+function updateGreeting(){
+  const hour = new Date().getHours();
+  let greeting = '';
+  let emoji = '';
 
+  if (hour >= 5 && hour < 12) {
+    greeting = 'صباح الخير';
+    emoji = '☀️';
+  } else if (hour >= 12 && hour < 17) {
+    greeting = 'مساء الخير';
+    emoji = '🌤️';
+  } else if (hour >= 17 && hour < 21) {
+    greeting = 'مساء الخير';
+    emoji = '🌆';
+  } else {
+    greeting = 'ليلة سعيدة';
+    emoji = '🌙';
+  }
+
+  const title = document.getElementById('welcomeTitle');
+  const sub = document.getElementById('welcomeSub');
+  if (title) title.innerHTML = greeting + ' ' + emoji + '، أنا <strong>Roobrt</strong>';
+  if (sub) sub.textContent = 'مساعدك الذكي. كيفاش نقدر نعاونك اليوم؟';
+}
+
+// ============ Init ============
+(function init(){
+  // تحية ديناميكية
+  updateGreeting();
+  // تحديث كل دقيقة
+  setInterval(updateGreeting, 60000);
+
+  // الثيم
+  const saved = localStorage.getItem('roobrt_theme');
+  if (saved) {
+    setTheme(saved);
+  } else {
+    // ثيم أوتوماتيك حسب الوقت
+    const hour = new Date().getHours();
+    if (hour >= 7 && hour < 19) {
+      // نهار: ثيم فاتح أو أزرق
+      setTheme('blue');
+    } else {
+      // ليل: ثيم داكن
+      setTheme('blue');
+    }
+  }
+
+  // Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/static/service-worker.js').catch(() => {});
